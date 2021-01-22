@@ -19,7 +19,7 @@ const Layout: FunctionComponent<IProps> = ({ main }) => {
             <a>
               <img
                 src="/home-color.svg"
-                alt="Home house"
+                alt="Home cake"
                 className="inline w-6"
               ></img>
             </a>
@@ -32,8 +32,8 @@ const Layout: FunctionComponent<IProps> = ({ main }) => {
           </div>
           {authenticated ? (
             <>
-              <Link href="/houses/add">
-                <a>Add House</a>
+              <Link href="/cakes/add">
+                <a>Add Cake</a>
               </Link>
               <button onClick={logout}>Logout</button>
             </>

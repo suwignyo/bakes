@@ -2,13 +2,13 @@
 // import { Image } from "cloudinary-react";
 // import { useQuery, gql } from "@apollo/client";
 // import Layout from "src/components/layout";
-// import HouseNav from "src/components/houseNav";
+// import CakeNav from "src/components/cakeNav";
 // import SingleMap from "src/components/singleMap";
 // import {
-//   ShowHouseQuery,
-//   ShowHouseQueryVariables,
-// } from "src/generated/ShowHouseQuery";
+//   ShowCakeQuery,
+//   ShowCakeQueryVariables,
+// } from "src/generated/ShowCakeQuery";
 
-export default function ShowHouse() {
-  return <div>ShowHouse</div>;
+export default function ShowCake() {
+  return <div>ShowCake</div>;
 }

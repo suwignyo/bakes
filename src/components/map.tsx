@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import ReactMapGL, { Marker, Popup, ViewState } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 // import { useLocalState } from "src/utils/useLocalState";
-// import { HousesQuery_houses } from "src/generated/HousesQuery";
+// import { CakesQuery_cakes } from "src/generated/CakesQuery";
 // import { SearchBox } from "./searchBox";
 
 interface IProps {}
