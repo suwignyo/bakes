@@ -1,8 +1,23 @@
-// import Layout from "src/components/layout";
-// import FirebaseAuth from "src/components/firebaseAuth";
-// import { GetServerSideProps, NextApiRequest } from "next";
-// import { loadIdToken } from "src/auth/firebaseAdmin";
+import Layout from "src/components/layout";
+import FirebaseAuth from "src/components/firebaseAuth";
+import { GetServerSideProps, NextApiRequest } from "next";
+import { loadIdToken } from "src/auth/firebaseAdmin";
 
 export default function Auth() {
-  return <div>Auth</div>;
+  return <Layout main={<FirebaseAuth />}></Layout>;
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  // changing req from incoming messaged to NextApiRequest
+  const uid = await loadIdToken(req as NextApiRequest);
+
+  console.log({ uid }, "{uid}");
+
+  if (uid) {
+    res.setHeader("location", "/");
+    res.statusCode = 302;
+    res.end();
+  }
+
+  return { props: {} };
+};
