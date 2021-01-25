@@ -3,7 +3,7 @@ import { useQuery, gql } from "@apollo/client";
 import Layout from "src/components/layout";
 import { useRouter } from "next/router";
 // import CakeNav from "src/components/cakeNav";
-// import SingleMap from "src/components/singleMap";
+import SingleMap from "src/components/singleMap";
 // import {
 import {
   ShowCakeQuery,
@@ -70,7 +70,9 @@ function CakeData({ id }: { id: string }) {
 
             <p>{cake.bedrooms} 🛌🎂 house</p>
           </div>
-          <div className="sm:w-full md:w-1/2">SingleMap</div>
+          <div className="sm:w-full md:w-1/2">
+            <SingleMap cake={cake}></SingleMap>
+          </div>
         </div>
       }
     />
