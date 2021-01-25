@@ -11,7 +11,7 @@ type Cake {
   latitude: Float!
   longitude: Float!
   publicId: String!
-  uid: String!
+  userId: String!
 }
 
 input CakeInput {
@@ -37,5 +37,6 @@ type Mutation {
 }
 
 type Query {
+  cake(id: String!): Cake
   hello: String!
 }

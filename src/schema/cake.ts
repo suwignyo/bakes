@@ -50,7 +50,7 @@ class Cake {
   id!: number;
 
   @Field((_type) => String)
-  uid!: string;
+  userId!: string;
 
   @Field((_type) => Float)
   latitude!: number;
@@ -76,6 +76,11 @@ class Cake {
 
 @Resolver()
 export class CakeResolver {
+  @Query((_returns) => Cake, { nullable: true })
+  async cake(@Arg("id") id: string, @Ctx() ctx: Context) {
+    return ctx.prisma.cake.findOne({ where: { id: parseInt(id, 10) } });
+  }
+
   @Authorized()
   @Mutation((_returns) => Cake, { nullable: true })
   async createCake(
