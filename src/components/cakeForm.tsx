@@ -1,14 +1,14 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
-// import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import Link from "next/link";
 // import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
-// import {
-//   CreateCakeMutation,
-//   CreateCakeMutationVariables,
-// } from "src/generated/CreateCakeMutation";
+import {
+  CreateCakeMutation,
+  CreateCakeMutationVariables,
+} from "src/generated/CreateCakeMutation";
 // import {
 //   UpdateCakeMutation,
 //   UpdateCakeMutationVariables,
@@ -30,6 +30,14 @@ const SIGNATURE_MUTATION = gql`
     createImageSignature {
       signature
       timestamp
+    }
+  }
+`;
+
+const CREATE_CAKE_MUTATION = gql`
+  mutation CreateCakeMutation($input: CakeInput!) {
+    createCake(input: $input) {
+      id
     }
   }
 `;
@@ -58,6 +66,7 @@ async function uploadImage(
 }
 
 export default function CakeForm({}: IProps) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>();
   const {
@@ -73,6 +82,10 @@ export default function CakeForm({}: IProps) {
   const [createSignature] = useMutation<CreateSignatureMutation>(
     SIGNATURE_MUTATION
   );
+  const [createCake] = useMutation<
+    CreateCakeMutation,
+    CreateCakeMutationVariables
+  >(CREATE_CAKE_MUTATION);
 
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
@@ -86,6 +99,26 @@ export default function CakeForm({}: IProps) {
     if (signatureData) {
       const { signature, timestamp } = signatureData.createImageSignature;
       const imageData = await uploadImage(data.image[0], signature, timestamp);
+
+      const { data: cakeData } = await createCake({
+        variables: {
+          input: {
+            address: data.address,
+            bedrooms: parseInt(data.bedrooms, 10),
+            image: imageData.secure_url,
+            coordinates: {
+              latitude: data.latitude,
+              longitude: data.longitude,
+            },
+          },
+        },
+      });
+      if (cakeData?.createCake) {
+        router.push(`/cakes/${cakeData.createCake.id}`);
+      } else {
+        // put a toast later
+        alert("Fail to add item");
+      }
     }
   };
 

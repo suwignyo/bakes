@@ -3,12 +3,36 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Cake {
+  address: String!
+  bedrooms: Int!
+  id: ID!
+  image: String!
+  latitude: Float!
+  longitude: Float!
+  publicId: String!
+  uid: String!
+}
+
+input CakeInput {
+  address: String!
+  bedrooms: Int!
+  coordinates: CoordinatesInput!
+  image: String!
+}
+
+input CoordinatesInput {
+  latitude: Float!
+  longitude: Float!
+}
+
 type ImageSignature {
   signature: String!
   timestamp: Int!
 }
 
 type Mutation {
+  createCake(input: CakeInput!): Cake
   createImageSignature: ImageSignature!
 }
 
