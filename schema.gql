@@ -10,6 +10,7 @@ type Cake {
   image: String!
   latitude: Float!
   longitude: Float!
+  nearby: [Cake!]!
   publicId: String!
   userId: String!
 }

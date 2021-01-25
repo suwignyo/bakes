@@ -11,9 +11,10 @@ interface ICake {
 
 interface IProps {
   cake: ICake;
+  nearby: ICake[];
 }
 
-export default function SingleMap({ cake }: IProps) {
+export default function SingleMap({ cake, nearby }: IProps) {
   const [viewport, setViewport] = useState({
     latitude: cake.latitude,
     longitude: cake.longitude,
@@ -49,6 +50,21 @@ export default function SingleMap({ cake }: IProps) {
             <img src="/home-color.svg" className="w-8" alt="selected cake" />
           </button>
         </Marker>
+        {nearby.map((near) => (
+          <Marker
+            key={near.id}
+            latitude={near.latitude}
+            longitude={near.longitude}
+            offsetLeft={-15}
+            offsetTop={-15}
+          >
+            <Link href={`/cakes/${near.id}`}>
+              <a style={{ width: "30px", height: "30px", fontSize: "30px" }}>
+                <img src="/home-solid.svg" className="w-8" alt="nearby cake" />
+              </a>
+            </Link>
+          </Marker>
+        ))}
       </ReactMapGL>
     </div>
   );

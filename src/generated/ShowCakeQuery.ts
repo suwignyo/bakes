@@ -7,6 +7,13 @@
 // GraphQL query operation: ShowCakeQuery
 // ====================================================
 
+export interface ShowCakeQuery_cake_nearby {
+  __typename: "Cake";
+  id: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface ShowCakeQuery_cake {
   __typename: "Cake";
   id: string;
@@ -16,6 +23,7 @@ export interface ShowCakeQuery_cake {
   bedrooms: number;
   latitude: number;
   longitude: number;
+  nearby: ShowCakeQuery_cake_nearby[];
 }
 
 export interface ShowCakeQuery {

@@ -20,6 +20,11 @@ const SHOW_CAKE_QUERY = gql`
       bedrooms
       latitude
       longitude
+      nearby {
+        id
+        latitude
+        longitude
+      }
     }
   }
 `;
@@ -71,7 +76,7 @@ function CakeData({ id }: { id: string }) {
             <p>{cake.bedrooms} 🛌🎂 house</p>
           </div>
           <div className="sm:w-full md:w-1/2">
-            <SingleMap cake={cake}></SingleMap>
+            <SingleMap cake={cake} nearby={cake.nearby}></SingleMap>
           </div>
         </div>
       }
