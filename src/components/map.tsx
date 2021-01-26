@@ -1,17 +1,19 @@
 import { useRef, useState } from "react";
-// import Link from "next/link";
-// import { Image } from "cloudinary-react";
+import Link from "next/link";
+import { Image } from "cloudinary-react";
 import ReactMapGL, { Marker, Popup, ViewState } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useLocalState } from "src/utils/useLocalState";
-// import { CakesQuery_cakes } from "src/generated/CakesQuery";
+import { CakesQuery_cakes } from "src/generated/CakesQuery";
 // import { SearchBox } from "./searchBox";
 
 interface IProps {
   setDataBounds: (bounds: string) => void;
+  cakes: CakesQuery_cakes[];
 }
 
-export default function Map({ setDataBounds }: IProps) {
+export default function Map({ setDataBounds, cakes }: IProps) {
+  const [selected, setSelected] = useState<CakesQuery_cakes | null>(null);
   const mapRef = useRef<ReactMapGL | null>(null);
   const [viewport, setViewport] = useLocalState<ViewState>("viewport", {
     latitude: 43,
@@ -43,7 +45,54 @@ export default function Map({ setDataBounds }: IProps) {
             setDataBounds(JSON.stringify(bounds.toArray()));
           }
         }}
-      ></ReactMapGL>
+      >
+        {cakes.map((cake) => {
+          return (
+            <Marker
+              key={cake.id}
+              latitude={cake.latitude}
+              longitude={cake.longitude}
+              offsetLeft={-15}
+              offsetTop={-15}
+            >
+              <button
+                type="button"
+                style={{ width: "30px", height: "30px", fontSize: "30px" }}
+                onClick={() => setSelected(cake)}
+              >
+                <img src="/home-solid.svg" className="w-8" alt="cake" />
+              </button>
+            </Marker>
+          );
+        })}
+        {!!selected && (
+          <Popup
+            latitude={selected.latitude}
+            longitude={selected.longitude}
+            onClose={() => setSelected(null)}
+            closeOnClick={false}
+          >
+            <div className="text-center">
+              <h3 className="px-4">{selected.address.substr(0, 30)}</h3>
+              <Image
+                className="mx-auto my-4"
+                cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+                publicId={selected.publicId}
+                secure
+                dpr="auto"
+                quality="auto"
+                width={200}
+                height={Math.floor((9 / 16) * 200)}
+                crop="fill"
+                gravity="auto"
+              ></Image>
+              <Link href={`/cakes/${selected.id}`}>
+                <a>View</a>
+              </Link>
+            </div>
+          </Popup>
+        )}
+      </ReactMapGL>
     </div>
   );
 }
