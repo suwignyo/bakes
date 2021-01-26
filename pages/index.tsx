@@ -1,4 +1,4 @@
-// import { useState } from "react";
+import { useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useDebounce } from "use-debounce";
 import Layout from "src/components/layout";
@@ -37,6 +37,7 @@ const parseBounds = (boundsString: string) => {
   };
 };
 export default function Home() {
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [dataBounds, setDataBounds] = useLocalState<string>(
     "bounds",
     "[[0,0],[0,0]]"
@@ -65,12 +66,16 @@ export default function Home() {
             className="w-1/2 pb-4"
             style={{ maxHeight: "calc(100vh - 64px)", overflowX: "scroll" }}
           >
-            <CakeList cakes={lastData?.cakes ? lastData.cakes : []} />
+            <CakeList
+              cakes={lastData?.cakes ? lastData.cakes : []}
+              setHighlightedId={setHighlightedId}
+            />
           </div>
           <div className="w-1/2">
             <Map
               setDataBounds={setDataBounds}
               cakes={lastData?.cakes ? lastData.cakes : []}
+              highlightedId={highlightedId}
             />
           </div>
         </div>

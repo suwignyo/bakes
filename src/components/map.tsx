@@ -10,9 +10,10 @@ import { CakesQuery_cakes } from "src/generated/CakesQuery";
 interface IProps {
   setDataBounds: (bounds: string) => void;
   cakes: CakesQuery_cakes[];
+  highlightedId: string | null;
 }
 
-export default function Map({ setDataBounds, cakes }: IProps) {
+export default function Map({ setDataBounds, cakes, highlightedId }: IProps) {
   const [selected, setSelected] = useState<CakesQuery_cakes | null>(null);
   const mapRef = useRef<ReactMapGL | null>(null);
   const [viewport, setViewport] = useLocalState<ViewState>("viewport", {
@@ -54,13 +55,22 @@ export default function Map({ setDataBounds, cakes }: IProps) {
               longitude={cake.longitude}
               offsetLeft={-15}
               offsetTop={-15}
+              className={highlightedId === cake.id ? "marker-active" : ""}
             >
               <button
                 type="button"
                 style={{ width: "30px", height: "30px", fontSize: "30px" }}
                 onClick={() => setSelected(cake)}
               >
-                <img src="/home-solid.svg" className="w-8" alt="cake" />
+                <img
+                  src={
+                    highlightedId === cake.id
+                      ? "/home-color.svg"
+                      : "/home-solid.svg"
+                  }
+                  className="w-8"
+                  alt="cake"
+                />
               </button>
             </Marker>
           );

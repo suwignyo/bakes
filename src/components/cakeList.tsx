@@ -4,14 +4,19 @@ import { CakesQuery_cakes } from "src/generated/CakesQuery";
 
 interface IProps {
   cakes: CakesQuery_cakes[];
+  setHighlightedId: (id: string | null) => void;
 }
 
-export default function HouseList({ cakes }: IProps) {
+export default function HouseList({ cakes, setHighlightedId }: IProps) {
   return (
     <>
       {cakes.map((cake) => (
         <Link key={cake.id} href={`/cakes/${cake.id}`}>
-          <div className="px-6 pt-4 cursor-pointer flex flex-wrap">
+          <div
+            className="px-6 pt-4 cursor-pointer flex flex-wrap"
+            onMouseEnter={() => setHighlightedId(cake.id)}
+            onMouseLeave={() => setHighlightedId(null)}
+          >
             <div className="sm:w-full md:w-1/2">
               <Image
                 cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
