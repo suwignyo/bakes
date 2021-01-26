@@ -30,6 +30,15 @@ class CoordinatesInput {
 }
 
 @InputType()
+class BoundsInput {
+  @Field((_type) => CoordinatesInput)
+  sw!: CoordinatesInput;
+
+  @Field((_type) => CoordinatesInput)
+  ne!: CoordinatesInput;
+}
+
+@InputType()
 class CakeInput {
   @Field((_type) => String)
   address!: string;
@@ -100,6 +109,17 @@ export class CakeResolver {
   @Query((_returns) => Cake, { nullable: true })
   async cake(@Arg("id") id: string, @Ctx() ctx: Context) {
     return ctx.prisma.cake.findOne({ where: { id: parseInt(id, 10) } });
+  }
+
+  @Query((_returns) => [Cake], { nullable: false })
+  async cakes(@Arg("bounds") bounds: BoundsInput, @Ctx() ctx: Context) {
+    return ctx.prisma.cake.findMany({
+      where: {
+        latitude: { gte: bounds.sw.latitude, lte: bounds.ne.latitude },
+        longitude: { gte: bounds.sw.longitude, lte: bounds.ne.longitude },
+      },
+      take: 50,
+    });
   }
 
   @Authorized()

@@ -3,6 +3,11 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input BoundsInput {
+  ne: CoordinatesInput!
+  sw: CoordinatesInput!
+}
+
 type Cake {
   address: String!
   bedrooms: Int!
@@ -39,5 +44,6 @@ type Mutation {
 
 type Query {
   cake(id: String!): Cake
+  cakes(bounds: BoundsInput!): [Cake!]!
   hello: String!
 }
