@@ -139,4 +139,28 @@ export class CakeResolver {
       },
     });
   }
+
+  @Authorized()
+  @Mutation((_returns) => Cake, { nullable: true })
+  async updateCake(
+    @Arg("id") id: string,
+    @Arg("input") input: CakeInput,
+    @Ctx() ctx: AuthorizedContext
+  ) {
+    const cakeId = parseInt(id, 10);
+    const cake = await ctx.prisma.cake.findOne({ where: { id: cakeId } });
+
+    if (!cake || cake.userId !== ctx.uid) return null;
+
+    return await ctx.prisma.cake.update({
+      where: { id: cakeId },
+      data: {
+        image: input.image,
+        address: input.address,
+        latitude: input.coordinates.latitude,
+        longitude: input.coordinates.longitude,
+        bedrooms: input.bedrooms,
+      },
+    });
+  }
 }

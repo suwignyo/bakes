@@ -3,16 +3,16 @@ import { useForm } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
 import { Router, useRouter } from "next/router";
 import Link from "next/link";
-// import { Image } from "cloudinary-react";
+import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
 import {
   CreateCakeMutation,
   CreateCakeMutationVariables,
 } from "src/generated/CreateCakeMutation";
-// import {
-//   UpdateCakeMutation,
-//   UpdateCakeMutationVariables,
-// } from "src/generated/UpdateCakeMutation";
+import {
+  UpdateCakeMutation,
+  UpdateCakeMutationVariables,
+} from "src/generated/UpdateCakeMutation";
 import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
 
 interface IFormData {
@@ -22,8 +22,6 @@ interface IFormData {
   bedrooms: string;
   image: FileList;
 }
-
-interface IProps {}
 
 const SIGNATURE_MUTATION = gql`
   mutation CreateSignatureMutation {
@@ -41,6 +39,33 @@ const CREATE_CAKE_MUTATION = gql`
     }
   }
 `;
+
+const UPDATE_CAKE_MUTATION = gql`
+  mutation UpdateCakeMutation($id: String!, $input: CakeInput!) {
+    updateCake(id: $id, input: $input) {
+      id
+      image
+      publicId
+      latitude
+      longitude
+      bedrooms
+      address
+    }
+  }
+`;
+
+interface ICake {
+  id: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  bedrooms: number;
+  image: string;
+  publicId: string;
+}
+interface IProps {
+  cake?: ICake;
+}
 
 interface IUploadImageResponse {
   secure_url: string;
@@ -65,7 +90,7 @@ async function uploadImage(
   return response.json();
 }
 
-export default function CakeForm({}: IProps) {
+export default function CakeForm({ cake }: IProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>();
@@ -75,7 +100,16 @@ export default function CakeForm({}: IProps) {
     handleSubmit,
     setValue,
     watch,
-  } = useForm<IFormData>({ defaultValues: {} });
+  } = useForm<IFormData>({
+    defaultValues: cake
+      ? {
+          address: cake?.address,
+          latitude: cake?.latitude,
+          longitude: cake?.longitude,
+          bedrooms: cake?.bedrooms.toString(),
+        }
+      : {},
+  });
 
   const address = watch("address");
 
@@ -86,6 +120,11 @@ export default function CakeForm({}: IProps) {
     CreateCakeMutation,
     CreateCakeMutationVariables
   >(CREATE_CAKE_MUTATION);
+
+  const [updateCake] = useMutation<
+    UpdateCakeMutation,
+    UpdateCakeMutationVariables
+  >(UPDATE_CAKE_MUTATION);
 
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
@@ -122,14 +161,55 @@ export default function CakeForm({}: IProps) {
     }
   };
 
+  const handleUpdate = async (currentCake: ICake, data: IFormData) => {
+    let image = currentCake.image;
+
+    if (data.image[0]) {
+      const { data: signatureData } = await createSignature();
+      if (signatureData) {
+        const { signature, timestamp } = signatureData.createImageSignature;
+        const imageData = await uploadImage(
+          data.image[0],
+          signature,
+          timestamp
+        );
+        image = imageData.secure_url;
+      }
+    }
+    const { data: cakeData } = await updateCake({
+      variables: {
+        id: currentCake.id,
+        input: {
+          address: data.address,
+          bedrooms: parseInt(data.bedrooms, 10),
+          image: image,
+          coordinates: {
+            latitude: data.latitude,
+            longitude: data.longitude,
+          },
+        },
+      },
+    });
+    // if success go back to show
+    if (cakeData?.updateCake) {
+      router.push(`/cakes/${currentCake.id}`);
+    }
+  };
+
   const onSubmit = (data: IFormData) => {
     setSubmitting(true);
-    handleCreate(data);
+    if (!!cake) {
+      handleUpdate(cake, data);
+    } else {
+      handleCreate(data);
+    }
   };
 
   return (
     <form className="mx-auto max-w-xl py-4" onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl">Add a new cake</h1>
+      <h1 className="text-xl">
+        {cake ? `Editing ${cake.address}` : "Adding a new cake"}
+      </h1>
       <div className="mt-4">
         <label htmlFor="search" className="block">
           Search for your address
@@ -141,7 +221,7 @@ export default function CakeForm({}: IProps) {
             setValue("longitude", longitude);
             setValue("latitude", latitude);
           }}
-          defaultValue=""
+          defaultValue={cake ? cake.address : ""}
         />
         {errors.address && <p>{errors.address.message}</p>}
       </div>
@@ -162,7 +242,7 @@ export default function CakeForm({}: IProps) {
               style={{ display: "none" }}
               ref={register({
                 validate: (fileList: FileList) => {
-                  if (fileList.length >= 0) return true;
+                  if (cake || fileList.length >= 0) return true;
                   return "Please upload a file";
                 },
               })}
@@ -177,13 +257,27 @@ export default function CakeForm({}: IProps) {
                 }
               }}
             ></input>
-            {previewImage && (
+            {previewImage ? (
               <img
                 src={previewImage}
                 className="mt-4 object-cover"
                 style={{ width: "576px", height: `${(9 / 16) * 576}px` }}
               ></img>
-            )}
+            ) : cake ? (
+              <Image
+                className="mt-4"
+                cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+                publicId={cake.publicId}
+                alt={cake.address}
+                secure
+                dpr="auto"
+                quality="auto"
+                width={576}
+                height={Math.floor((9 / 16) * 576)}
+                gravity="auto"
+                crop="fill"
+              ></Image>
+            ) : null}
             {errors.image && <p>{errors.image.message}</p>}
             <div className="mt-4">
               <label htmlFor="bedrooms" className="block">
@@ -213,7 +307,7 @@ export default function CakeForm({}: IProps) {
               >
                 Save
               </button>
-              <Link href="/">
+              <Link href={cake ? `/cake/${cake.id}` : "/"}>
                 <a className="p-2">Cancel</a>
               </Link>
             </div>

@@ -2,9 +2,8 @@ import { Image } from "cloudinary-react";
 import { useQuery, gql } from "@apollo/client";
 import Layout from "src/components/layout";
 import { useRouter } from "next/router";
-// import CakeNav from "src/components/cakeNav";
+import CakeNav from "src/components/cakeNav";
 import SingleMap from "src/components/singleMap";
-// import {
 import {
   ShowCakeQuery,
   ShowCakeQueryVariables,
@@ -58,7 +57,7 @@ function CakeData({ id }: { id: string }) {
         <div className="sm:block md:flex">
           <div className="sm:w-full md:w-1/2 p-4">
             <h1 className="text-3xl my-2">{cake.address}</h1>
-
+            <CakeNav cake={{ id: cake.id, userId: cake.userId }}></CakeNav>
             <Image
               className="pb-2"
               cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
