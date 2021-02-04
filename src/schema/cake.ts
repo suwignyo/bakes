@@ -163,4 +163,21 @@ export class CakeResolver {
       },
     });
   }
+
+  @Authorized()
+  @Mutation((_returns) => Boolean, { nullable: true })
+  async deleteCake(
+    @Arg("id") id: string,
+    @Ctx() ctx: AuthorizedContext
+  ): Promise<boolean> {
+    const cakeId = parseInt(id, 10);
+    const cake = await ctx.prisma.cake.findOne({ where: { id: cakeId } });
+    if (!cake || cake.userId !== ctx.uid) return false;
+
+    await ctx.prisma.cake.delete({
+      where: { id: cakeId },
+    });
+
+    return true;
+  }
 }

@@ -40,11 +40,11 @@ type ImageSignature {
 type Mutation {
   createCake(input: CakeInput!): Cake
   createImageSignature: ImageSignature!
+  deleteCake(id: String!): Boolean
   updateCake(id: String!, input: CakeInput!): Cake
 }
 
 type Query {
   cake(id: String!): Cake
   cakes(bounds: BoundsInput!): [Cake!]!
-  hello: String!
 }
